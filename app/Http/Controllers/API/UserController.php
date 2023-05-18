@@ -15,12 +15,12 @@ class UserController extends Controller
         $validator = Validator::make($request->all(),[
             'name'=> 'required|string|min:3|max:100',
             'email'=> 'required|string|email',
-            'password'=> 'required|string|min:6|confirmed'
+            'password'=> 'required|string|min:6|unique:users|confirmed'
         ]);
 
         if($validator->fails())
         {
-            return response()->json(['message'=>'validation fails','errors'=>$validator->errors()]);
+            return response()->json($validator->errors());
         }
         else
         {
@@ -35,5 +35,37 @@ class UserController extends Controller
                 'user' => $user
             ]);
         }
+    }
+
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(),[
+            'email' => 'required|string|min:3|',
+            'password' => 'required|string|min:6'
+        ]);
+
+        if($validator->fails())
+        {
+            return response()->json($validator->errors());
+        }
+        else
+        {
+            if(!$token = auth()->attempt($validator->validated()))
+            {
+                return response()->json(['success'=>false,'message'=>'Username or password not correct']);
+            }
+
+            return $this->respondWithToken($token);
+        }
+    }
+
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'success' => true,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'expires_in' => auth()->factory()->getTTL()*60
+        ]);
     }
 }
