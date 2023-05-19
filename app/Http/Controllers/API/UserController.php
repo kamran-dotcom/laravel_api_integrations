@@ -78,4 +78,14 @@ class UserController extends Controller
             return response()->json(['success'=>false, 'message'=>$e->getMessage()]);
         }
     }
+
+    public function profile()
+    {
+        try{
+            return response()->json(['success'=>true, 'data'=>auth()->user()]);
+        }
+        catch(\Exception $e){
+            return response()->json(['success'=>false,'message'=>$e->getMessage()]);
+        }
+    }
 }
