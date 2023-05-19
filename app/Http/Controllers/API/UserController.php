@@ -68,4 +68,14 @@ class UserController extends Controller
             'expires_in' => auth()->factory()->getTTL()*60
         ]);
     }
+
+    public function logout()
+    {
+        try{
+            auth()->logout();
+            return response()->json(['success'=>true, 'message'=>'User Successfully loggedout']);
+        } catch(\Exception $e){
+            return response()->json(['success'=>false, 'message'=>$e->getMessage()]);
+        }
+    }
 }
