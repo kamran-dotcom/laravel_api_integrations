@@ -88,4 +88,36 @@ class UserController extends Controller
             return response()->json(['success'=>false,'message'=>$e->getMessage()]);
         }
     }
+
+    public function updateUser(Request $request)
+    {
+        if(auth()->user())
+        {
+
+            $validator = Validator::make($request->all(),[
+                'id' => 'required',
+                'name' => 'required|string',
+                'email'=> 'required|string|email'
+            ]);
+    
+            if($validator->fails())
+            {
+                return response()->json($validator->errors());
+            }
+            else
+            {
+                $user = User::find($request->id);
+
+                $user->name = $request->name;
+                $user->email = $request->email;
+                $user->save();
+
+                return response()->json(["success"=>true, "message"=> "User updated...", "data"=>$user]);
+            }
+        }
+        else
+        {
+            return response()->json(["success"=> false, 'message'=> "User not authenticated..."]);
+        }
+    }
 }
